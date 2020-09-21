@@ -60,8 +60,7 @@ object Token extends Enumeration {
 
   val THEN_STMT       = Value
   val ELSE_STMT       = Value
-  val VAR_STMT        = Value
   val TYPE_STMT       = Value
-  val VAR             = Value
+  val VAR_STMT        = Value
 
 }
