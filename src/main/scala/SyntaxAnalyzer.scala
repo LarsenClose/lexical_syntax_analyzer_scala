@@ -76,80 +76,25 @@ private def parseBody(): Tree = {
   tree
 }
 
-private def parseVariableSection(): Tree = {
-
-  val tree = new Tree("var_sct")
-  getLexemeUnit()
-
-  tree.add(new Tree(lexemeUnit.getLexeme()))
-  lexemeUnit = null
-  getLexemeUnit()
-
-
-  var done = false
-
-  while (lexemeUnit.getToken() != Token.EOF) {
-      tree.add(parseVariableDeclaration())
-
-      if (lexemeUnit.getToken() == Token.SEMI_COLON) {
-          tree.add(new Tree(lexemeUnit.getLexeme()))
-          lexemeUnit = null
-          getLexemeUnit()
-        }
-        else
-          done = true
-    }
-  tree
-}
-
-private def parseVariableDeclaration(): Tree = {
-
-  val tree = new Tree("var_dct")
-  getLexemeUnit()
-
-    while (lexemeUnit.getToken() == Token.IDENTIFIER && lexemeUnit.getToken() != Token.EOF){
-        tree.add(parseIdentifier())
-        lexemeUnit = null
-        getLexemeUnit()
-    }
-    if (lexemeUnit.getToken() != Token.COLON) {
-      // throw new Exception("Syntax Analyzer Error: colon expected!")
-    }
-    tree.add(new Tree(lexemeUnit.getLexeme()))
-    lexemeUnit = null
-    getLexemeUnit()
-    tree.add(parseType())
-
-  tree
-}
-private def parseType(): Tree = {
-
-  val tree = new Tree("type")
-  getLexemeUnit()
-
-  if (lexemeUnit.getToken() == Token.TYPE_STMT) {
-    tree.add(new Tree(lexemeUnit.getLexeme()))
-    lexemeUnit = null
-    getLexemeUnit()
-  }
-  else {
-    // throw new Exception("Syntax Analyzer Error: type expected!")
-  }
-  tree
-}
-
-
 private def parseBlock(): Tree = {
 
   val tree = new Tree("block")
   getLexemeUnit()
 
-  if (lexemeUnit.getToken() != Token.BEGIN_STMT) {
-    // throw new Exception("Syntax Analyzer Error: block begin expected!")
-  }
   tree.add(new Tree(lexemeUnit.getLexeme()))
   lexemeUnit = null
   getLexemeUnit()
+
+
+  // if (lexemeUnit.getToken() == Token.BEGIN_STMT) {
+  //   tree.add(new Tree(lexemeUnit.getLexeme()))
+  //   lexemeUnit = null
+  //   getLexemeUnit()
+  // }
+  // else
+  //   throw new Exception("Syntax Analyzer Error: block begin expected!")
+
+
 
   var done = false
   while (lexemeUnit.getToken() != Token.EOF || done == true) {
@@ -174,6 +119,73 @@ private def parseBlock(): Tree = {
     tree
 
 } // end parseBlock
+
+private def parseVariableSection(): Tree = {
+
+  val tree = new Tree("var_sct")
+  getLexemeUnit()
+
+  tree.add(new Tree(lexemeUnit.getLexeme()))
+  lexemeUnit = null
+  getLexemeUnit()
+  tree.add(parseVariableDeclaration())
+
+
+  // var done = false
+  //
+  // while (lexemeUnit.getToken() != Token.EOF) {
+  //     tree.add(parseVariableDeclaration())
+  //
+  //     if (lexemeUnit.getToken() == Token.SEMI_COLON) {
+  //         tree.add(new Tree(lexemeUnit.getLexeme()))
+  //         lexemeUnit = null
+  //         getLexemeUnit()
+  //       }
+  //       else
+  //         done = true
+  //   }
+  tree
+}
+
+private def parseVariableDeclaration(): Tree = {
+
+  val tree = new Tree("var_dct")
+  getLexemeUnit()
+
+
+  while (lexemeUnit.getToken() == Token.IDENTIFIER){
+      tree.add(parseIdentifier())
+      lexemeUnit = null
+      getLexemeUnit()
+  }
+
+  if (lexemeUnit.getToken() != Token.COLON) {
+    // throw new Exception("Syntax Analyzer Error: colon expected!")
+  }
+  tree.add(new Tree(lexemeUnit.getLexeme()))
+  lexemeUnit = null
+  getLexemeUnit()
+  tree.add(parseType())
+
+  tree
+}
+
+
+private def parseType(): Tree = {
+
+  val tree = new Tree("type")
+  getLexemeUnit()
+
+  if (lexemeUnit.getToken() == Token.TYPE_STMT) {
+    tree.add(new Tree(lexemeUnit.getLexeme()))
+    lexemeUnit = null
+    getLexemeUnit()
+  }
+  else {
+    // throw new Exception("Syntax Analyzer Error: type expected!")
+  }
+  tree
+}
 
 private def parseStatement(): Tree = {
 
@@ -279,12 +291,19 @@ private def parseWalrus(): Tree = {
   val tree = new Tree("assgm_stmt")
   getLexemeUnit()
 
+  // if (lexemeUnit.getToken() != Token.IDENTIFIER) {
+  //   throw new Exception("Syntax Analyzer Error: identifier expected!")
+  // }
+  if (lexemeUnit.getToken() == Token.IDENTIFIER) {
   tree.add(parseIdentifier())
   lexemeUnit = null
   getLexemeUnit()
-  if (lexemeUnit.getToken() != Token.WALRUS) {
-    // throw new Exception("Syntax Analyzer Error: walrus expected!")
-  }
+}
+
+  // if (lexemeUnit.getToken() != Token.WALRUS) {
+  //   throw new Exception("Syntax Analyzer Error: walrus expected!")
+  // }
+
   tree.add(new Tree(lexemeUnit.getLexeme()))
   lexemeUnit = null
   getLexemeUnit()
