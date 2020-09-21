@@ -12,7 +12,7 @@ object Token extends Enumeration {
   val EOF             = Value
   val IDENTIFIER      = Value
   val INT_LITERAL     = Value
-
+  val VAR_STMT        = Value
 // there are no parens in this grammar
   // val OPEN_PAR        = Value
   // val CLOSE_PAR       = Value
@@ -24,9 +24,9 @@ object Token extends Enumeration {
   val DIV_OP          = Value
 
 // combinable operators
-  val GREATER_THAN      = Value
-  val LESS_THAN         = Value
-  val EQUAL_TO          = Value
+  val GREATER_THAN     = Value
+  val LESS_THAN        = Value
+  val EQUAL_TO         = Value
 
 
   val GREATER_EQUAL   = Value
@@ -61,6 +61,6 @@ object Token extends Enumeration {
   val THEN_STMT       = Value
   val ELSE_STMT       = Value
   val TYPE_STMT       = Value
-  val VAR_STMT        = Value
+
 
 }

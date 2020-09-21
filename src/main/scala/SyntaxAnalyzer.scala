@@ -37,17 +37,24 @@ class SyntaxAnalyzer(private var source: String) {
       // throw new Exception("Syntax Analyzer Error: identifier expected!")
     }
     tree.add(parseIdentifier())
-
-    while (lexemeUnit.getToken() != Token.EOF || lexemeUnit.getToken() != Token.PERIOD) {
-      tree.add(parseBody())
-      }
-
+    lexemeUnit = null
     getLexemeUnit()
+
+    while (lexemeUnit.getToken() != Token.EOF) {
+      tree.add(parseBody())
+      if (lexemeUnit.getToken() == Token.PERIOD) {
+          tree.add(new Tree(lexemeUnit.getLexeme()))
+          lexemeUnit = null
+          getLexemeUnit()
+        }
+    }
+
+
     if (lexemeUnit.getToken() != Token.PERIOD) {
       // throw new Exception("Syntax Analyzer Error: '.' expected!")
     }
 
-      tree.add(new Tree(lexemeUnit.getLexeme()))
+
     // return the tree
     tree
   }
@@ -57,13 +64,15 @@ private def parseBody(): Tree = {
 
   val tree = new Tree("body")
   getLexemeUnit()
-
+  print(lexemeUnit)
+  print(lexemeUnit.getToken())
+  print(tree)
   if (lexemeUnit.getToken() == Token.VAR_STMT) {
     tree.add(parseVariableSection())
   }
-  else {
-    tree.add(parseBlock())
-  }
+
+  tree.add(parseBlock())
+
   tree
 }
 
@@ -98,7 +107,7 @@ private def parseVariableDeclaration(): Tree = {
   val tree = new Tree("var_dct")
   getLexemeUnit()
 
-    while (lexemeUnit.getToken() == Token.IDENTIFIER){
+    while (lexemeUnit.getToken() == Token.IDENTIFIER && lexemeUnit.getToken() != Token.EOF){
         tree.add(parseIdentifier())
         lexemeUnit = null
         getLexemeUnit()
