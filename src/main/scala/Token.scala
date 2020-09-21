@@ -28,8 +28,7 @@ object Token extends Enumeration {
   val LESS_THAN         = Value
   val EQUAL_TO          = Value
 
-// combined operators
-  val WALRUS          = Value
+
   val GREATER_EQUAL   = Value
   val LESS_EQUAL      = Value
 
@@ -42,17 +41,27 @@ object Token extends Enumeration {
 
 // key word tokens
   val PROGRAM         = Value
+
+
   val BOOL_LITERAL    = Value
+
+// regrouping for syntax perspective
+  val WALRUS          = Value
   val READ_STMT       = Value
-  val BEGIN_STMT      = Value
-  val END_STMT        = Value
-  val WHILE_STMT      = Value
-  val DO_STMT         = Value
+  val WRITE_STMT      = Value
   val IF_STMT         = Value
+  val WHILE_STMT      = Value
+  val BEGIN_STMT      = Value
+
+
+
+  val END_STMT        = Value
+  val DO_STMT         = Value
+
   val THEN_STMT       = Value
   val ELSE_STMT       = Value
-  val WRITE_STMT      = Value
   val VAR_STMT        = Value
   val TYPE_STMT       = Value
+  val VAR             = Value
 
 }
