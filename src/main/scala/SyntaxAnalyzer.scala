@@ -2,7 +2,7 @@
  * CS3210 - Principles of Programming Languages - Fall 2020
  * Instructor: Thyago Mota
  * Description: Prg01 - Syntax Analyzer
- * Student(s) Name(s):
+ * Student: Larsen Close
  */
 
 class SyntaxAnalyzer(private var source: String) {
@@ -24,10 +24,23 @@ class SyntaxAnalyzer(private var source: String) {
   private def parseProgram() = {
     // create a tree with label "program"
     val tree = new Tree("program")
+    getLexemeUnit()
+
+    if (lexemeUnit.getToken() == Token.PROGRAM) {}
+
+    // while (lexemeUnit.getToken() != Token.EOF) {
+    //   tree.add(parseSyntaxRule())
+    //   if (lexemeUnit.getToken() == Token.NEW_LINE) {
+    //     tree.add(new Tree(lexemeUnit.getLexeme()))
+    //     lexemeUnit = null
+    //     getLexemeUnit()
+    //   }
+    // }
 
     // return the tree
     tree
   }
+}
 
 object SyntaxAnalyzer {
   def main(args: Array[String]): Unit = {
