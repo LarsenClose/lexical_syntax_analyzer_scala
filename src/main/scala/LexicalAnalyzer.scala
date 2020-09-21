@@ -180,8 +180,6 @@ object LexicalAnalyzer {
   val WORD_TO_TOKEN = Map(
   "program"  -> Token.PROGRAM,
 
-  "var"      -> Token.VAR,
-
   "read"     -> Token.READ_STMT,
   "write"    -> Token.WRITE_STMT,
 
