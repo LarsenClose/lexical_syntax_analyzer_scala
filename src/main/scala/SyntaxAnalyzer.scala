@@ -40,17 +40,18 @@ class SyntaxAnalyzer(private var source: String) {
     lexemeUnit = null
     getLexemeUnit()
 
-    while (lexemeUnit.getToken() != Token.EOF) {
+    var run = true
+    while (run) {
       tree.add(parseBody())
-      if (lexemeUnit.getToken() == Token.PERIOD) {
-          tree.add(new Tree(lexemeUnit.getLexeme()))
-          lexemeUnit = null
-          getLexemeUnit()
+      if (lexemeUnit.getToken() == Token.EOF || lexemeUnit.getToken() == Token.PERIOD) {
+          run = false
         }
     }
 
-
-    if (lexemeUnit.getToken() != Token.PERIOD) {
+    if (lexemeUnit.getToken() == Token.PERIOD) {
+      tree.add(new Tree(lexemeUnit.getLexeme()))
+      lexemeUnit = null
+      getLexemeUnit()
       // throw new Exception("Syntax Analyzer Error: '.' expected!")
     }
 
@@ -64,14 +65,13 @@ private def parseBody(): Tree = {
 
   val tree = new Tree("body")
   getLexemeUnit()
-  print(lexemeUnit)
-  print(lexemeUnit.getToken())
-  print(tree)
+
   if (lexemeUnit.getToken() == Token.VAR_STMT) {
     tree.add(parseVariableSection())
+    tree.add(parseBlock())
   }
-
-  tree.add(parseBlock())
+  else
+    tree.add(parseBlock())
 
   tree
 }
@@ -93,30 +93,31 @@ private def parseBlock(): Tree = {
   // }
   // else
   //   throw new Exception("Syntax Analyzer Error: block begin expected!")
+  var run = true
+  while (run) {
+    tree.add(parseStatement())
+
+    if (lexemeUnit.getToken() == Token.SEMI_COLON) {
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()
+      }
+
+    if (lexemeUnit.getToken() == Token.EOF || lexemeUnit.getToken() == Token.END_STMT) {
+        run = false
+      }
+
+  }
 
 
+  if (lexemeUnit.getToken() != Token.END_STMT) {
+    // throw new Exception("Syntax Analyzer Error: block end expected!")
+  }
+  tree.add(new Tree(lexemeUnit.getLexeme()))
+  lexemeUnit = null
+  getLexemeUnit()
 
-  var done = false
-  while (lexemeUnit.getToken() != Token.EOF || done == true) {
-      tree.add(parseStatement())
-
-      if (lexemeUnit.getToken() == Token.SEMI_COLON) {
-          tree.add(new Tree(lexemeUnit.getLexeme()))
-          lexemeUnit = null
-          getLexemeUnit()
-        }
-        else
-          done = true
-
-    }
-    if (lexemeUnit.getToken() != Token.END_STMT) {
-      // throw new Exception("Syntax Analyzer Error: block end expected!")
-    }
-    tree.add(new Tree(lexemeUnit.getLexeme()))
-    lexemeUnit = null
-    getLexemeUnit()
-
-    tree
+  tree
 
 } // end parseBlock
 
@@ -128,6 +129,7 @@ private def parseVariableSection(): Tree = {
   tree.add(new Tree(lexemeUnit.getLexeme()))
   lexemeUnit = null
   getLexemeUnit()
+
   tree.add(parseVariableDeclaration())
 
 
@@ -152,11 +154,14 @@ private def parseVariableDeclaration(): Tree = {
   val tree = new Tree("var_dct")
   getLexemeUnit()
 
-
-  while (lexemeUnit.getToken() == Token.IDENTIFIER){
-      tree.add(parseIdentifier())
-      lexemeUnit = null
-      getLexemeUnit()
+  var run = true
+  while (run) {
+    tree.add(parseIdentifier())
+    lexemeUnit = null
+    getLexemeUnit()
+    if (lexemeUnit.getToken() == Token.COLON || lexemeUnit.getToken() == Token.EOF) {
+      run = false
+    }
   }
 
   if (lexemeUnit.getToken() != Token.COLON) {
@@ -192,15 +197,36 @@ private def parseStatement(): Tree = {
   val tree = new Tree("stmt")
   getLexemeUnit()
 
-    lexemeUnit.getToken() match{
-      case Token.IDENTIFIER   => tree.add(parseWalrus())
-      case Token.READ_STMT    => tree.add(parseReadStatement())
-      case Token.WRITE_STMT   => tree.add(parseWriteStatement())
-      case Token.IF_STMT      => tree.add(parseIfStatement())
-      case Token.WHILE_STMT   => tree.add(parseWhiletatement())
-      case Token.BEGIN_STMT   => tree.add(parseBlock())
-      // case _                  => throw new Exception("Syntax Analyzer Error: statement expected!")
-    }
+  if (lexemeUnit.getToken() == Token.IDENTIFIER) {
+    tree.add(parseWalrus())
+    lexemeUnit = null
+    getLexemeUnit()}
+
+  else if (lexemeUnit.getToken() == Token.READ_STMT){
+    tree.add(parseReadStatement())
+    lexemeUnit = null
+    getLexemeUnit()}
+
+  else if (lexemeUnit.getToken() == Token.WRITE_STMT){
+    tree.add(parseWriteStatement())}
+
+  else if (lexemeUnit.getToken() == Token.IF_STMT){
+    tree.add(parseIfStatement())
+    lexemeUnit = null
+    getLexemeUnit()}
+
+  else if (lexemeUnit.getToken() == Token.WHILE_STMT){
+    tree.add(parseWhiletatement())
+    lexemeUnit = null
+    getLexemeUnit()}
+
+  else if (lexemeUnit.getToken() == Token.BEGIN_STMT){
+    tree.add(parseBlock())
+    lexemeUnit = null
+    getLexemeUnit()}
+
+
+
 
   tree
 }
@@ -336,18 +362,38 @@ private def parseBooleanExpression(): Tree = {
     lexemeUnit = null
     getLexemeUnit()
   }
-  tree.add(parseArithmeticExpression)
-  getLexemeUnit()
-  lexemeUnit.getToken() match{
-    case Token.GREATER_THAN   => tree.add(new Tree(lexemeUnit.getLexeme()))
-    case Token.LESS_THAN      => tree.add(new Tree(lexemeUnit.getLexeme()))
-    case Token.EQUAL_TO       => tree.add(new Tree(lexemeUnit.getLexeme()))
-    case Token.GREATER_EQUAL  => tree.add(new Tree(lexemeUnit.getLexeme()))
-    case Token.LESS_EQUAL     => tree.add(new Tree(lexemeUnit.getLexeme()))
-    // case _                    => throw new Exception("Syntax Analyzer Error: comparison operator expected!")
-  }
-  lexemeUnit = null
-  getLexemeUnit()
+  else
+    tree.add(parseArithmeticExpression)
+    getLexemeUnit()
+
+      if (lexemeUnit.getToken() == Token.GREATER_THAN) {
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()}
+
+      else if (lexemeUnit.getToken() == Token.LESS_THAN){
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()}
+
+      else if (lexemeUnit.getToken() == Token.EQUAL_TO){
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()}
+
+      else if (lexemeUnit.getToken() == Token.GREATER_EQUAL){
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()}
+
+      else if (lexemeUnit.getToken() == Token.LESS_EQUAL){
+        tree.add(new Tree(lexemeUnit.getLexeme()))
+        lexemeUnit = null
+        getLexemeUnit()}
+
+      else
+        // throw new Exception("Syntax Analyzer Error: comparison operator expected!")
+
   tree.add(parseArithmeticExpression)
   tree
 }
