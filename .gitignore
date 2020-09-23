@@ -8,4 +8,4 @@ target*
 
 .bloop*
 
-
+.scalafmt.conf
